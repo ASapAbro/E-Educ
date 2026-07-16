@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Étudiants{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-people"></i> Étudiants ({{ students|length }})</h2>
+  <a href="{{ url_for('admin.student_add') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ajouter un étudiant</a>
+</div>
+
+<form class="row g-2 mb-3" method="GET">
+  <div class="col-md-4">
+    <input type="text" class="form-control" name="q" value="{{ search }}" placeholder="Rechercher nom, prénom, email...">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="niveau">
+      <option value="">Tous les niveaux</option>
+      {% for n in niveaux %}
+        <option value="{{ n }}" {{ 'selected' if n == niveau }}>{{ n }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="statut">
+      <option value="">Tous les statuts</option>
+      <option value="actif" {{ 'selected' if statut == 'actif' }}>Actif</option>
+      <option value="inactif" {{ 'selected' if statut == 'inactif' }}>Inactif</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-secondary w-100" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Nom</th><th>Prénom</th><th>Email</th><th>Niveau</th><th>Statut</th><th>Inscrit le</th><th></th></tr></thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td>{{ s.nom }}</td>
+        <td>{{ s.prenom }}</td>
+        <td>{{ s.email }}</td>
+        <td>{{ s.niveau }}</td>
+        <td><span class="badge {{ 'bg-success' if s.statut == 'actif' else 'bg-secondary' }}">{{ s.statut }}</span></td>
+        <td>{{ s.date_creation | datefmt }}</td>
+        <td class="text-end">
+          <a href="{{ url_for('admin.student_edit', student_id=s._id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+          <form method="POST" action="{{ url_for('admin.student_delete', student_id=s._id) }}" class="d-inline" onsubmit="return confirm('Supprimer définitivement cet étudiant ?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="text-center text-muted py-4">Aucun étudiant trouvé.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

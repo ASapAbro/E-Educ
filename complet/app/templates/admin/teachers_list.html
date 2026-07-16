@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Formateurs{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-person-badge"></i> Formateurs ({{ teachers|length }})</h2>
+  <a href="{{ url_for('admin.teacher_add') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ajouter un formateur</a>
+</div>
+
+<form class="row g-2 mb-3" method="GET">
+  <div class="col-md-5">
+    <input type="text" class="form-control" name="q" value="{{ search }}" placeholder="Rechercher nom, prénom, email...">
+  </div>
+  <div class="col-md-4">
+    <select class="form-select" name="specialite">
+      <option value="">Toutes les spécialités</option>
+      {% for sp in specialites %}
+        <option value="{{ sp }}" {{ 'selected' if sp == specialite }}>{{ sp }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <button class="btn btn-outline-secondary w-100" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Nom</th><th>Prénom</th><th>Email</th><th>Spécialité</th><th>Statut</th><th class="text-end">Formations</th><th></th></tr></thead>
+    <tbody>
+    {% for row in teachers %}
+      {% set t = row.teacher %}
+      <tr>
+        <td>{{ t.nom }}</td>
+        <td>{{ t.prenom }}</td>
+        <td>{{ t.email }}</td>
+        <td>{{ t.specialite }}</td>
+        <td><span class="badge {{ 'bg-success' if t.statut == 'actif' else 'bg-secondary' }}">{{ t.statut }}</span></td>
+        <td class="text-end">{{ row.nb_formations }}</td>
+        <td class="text-end">
+          <a href="{{ url_for('admin.teacher_edit', teacher_id=t._id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+          <form method="POST" action="{{ url_for('admin.teacher_delete', teacher_id=t._id) }}" class="d-inline" onsubmit="return confirm('Supprimer ce formateur ?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="text-center text-muted py-4">Aucun formateur trouvé.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

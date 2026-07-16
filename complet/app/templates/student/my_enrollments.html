@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Mes inscriptions{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clipboard-check"></i> Mes inscriptions ({{ inscriptions|length }})</h2>
+
+<div class="card shadow-sm">
+  <table class="table mb-0">
+    <thead><tr><th>Formation</th><th>Formateur</th><th>Date d'inscription</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+    <tbody>
+    {% for i in inscriptions %}
+      <tr>
+        <td>{{ i.formation.titre }}</td>
+        <td>{{ i.formation.formateur.prenom }} {{ i.formation.formateur.nom }}</td>
+        <td>{{ i.date_inscription | datefmt }}</td>
+        <td><span class="badge {{ 'bg-success' if i.statut == 'active' else 'bg-secondary' }}">{{ i.statut }}</span></td>
+        <td>{{ i.note if i.note is not none else '—' }}</td>
+        <td class="text-end">
+          {% if i.statut == 'active' and i.note is none %}
+          <form method="POST" action="{{ url_for('student.cancel_enrollment', inscription_id=i._id) }}" class="d-inline" onsubmit="return confirm('Annuler cette inscription ?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger">Annuler</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">Vous n'êtes inscrit à aucune formation.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

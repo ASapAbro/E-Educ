@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord administrateur{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Tableau de bord</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card text-bg-primary shadow-sm h-100">
+      <div class="card-body">
+        <div class="fs-2 fw-bold">{{ stats.nb_etudiants }}</div>
+        <div>Étudiants</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-bg-success shadow-sm h-100">
+      <div class="card-body">
+        <div class="fs-2 fw-bold">{{ stats.nb_formateurs }}</div>
+        <div>Formateurs</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-bg-warning shadow-sm h-100">
+      <div class="card-body">
+        <div class="fs-2 fw-bold">{{ stats.nb_formations }}</div>
+        <div>Formations</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-bg-info shadow-sm h-100">
+      <div class="card-body">
+        <div class="fs-2 fw-bold">{{ stats.nb_inscriptions }}</div>
+        <div>Inscriptions</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h6 class="text-muted">Prix moyen des formations</h6>
+        <div class="fs-3 fw-bold">{{ "%.2f"|format(stats.prix_moyen) }} €</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h6 class="text-muted">Note moyenne générale</h6>
+        <div class="fs-3 fw-bold">{{ stats.moyenne_generale }} / 20</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">Formations par catégorie</div>
+      <div class="card-body"><canvas id="chartCategories"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">Top 5 formations (inscriptions)</div>
+      <div class="card-body"><canvas id="chartTopFormations"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">Top 5 étudiants (moyenne)</div>
+      <div class="card-body"><canvas id="chartTopEtudiants"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Top 5 formations les plus demandées</div>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Formation</th><th>Catégorie</th><th class="text-end">Inscrits</th></tr></thead>
+        <tbody>
+        {% for f in stats.top_formations %}
+          <tr><td>{{ f.titre }}</td><td>{{ f.categorie }}</td><td class="text-end">{{ f.nb_inscrits }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Top 5 meilleurs étudiants</div>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Étudiant</th><th class="text-end">Moyenne</th><th class="text-end">Notes</th></tr></thead>
+        <tbody>
+        {% for e in stats.top_etudiants %}
+          <tr><td>{{ e.prenom }} {{ e.nom }}</td><td class="text-end">{{ e.moyenne }}/20</td><td class="text-end">{{ e.nb_notes }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const catLabels = {{ stats.par_categorie | map(attribute='_id') | list | tojson }};
+const catData = {{ stats.par_categorie | map(attribute='total') | list | tojson }};
+new Chart(document.getElementById('chartCategories'), {
+  type: 'pie',
+  data: { labels: catLabels, datasets: [{ data: catData,
+    backgroundColor: ['#0d6efd','#198754','#ffc107','#dc3545','#6f42c1','#20c997','#fd7e14','#6c757d'] }] },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+const topFLabels = {{ stats.top_formations | map(attribute='titre') | list | tojson }};
+const topFData = {{ stats.top_formations | map(attribute='nb_inscrits') | list | tojson }};
+new Chart(document.getElementById('chartTopFormations'), {
+  type: 'bar',
+  data: { labels: topFLabels, datasets: [{ label: 'Inscrits', data: topFData, backgroundColor: '#0d6efd' }] },
+  options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+});
+
+const topELabels = {{ stats.top_etudiants | map(attribute='nom') | list | tojson }};
+const topEData = {{ stats.top_etudiants | map(attribute='moyenne') | list | tojson }};
+new Chart(document.getElementById('chartTopEtudiants'), {
+  type: 'bar',
+  data: { labels: topELabels, datasets: [{ label: 'Moyenne /20', data: topEData, backgroundColor: '#198754' }] },
+  options: { scales: { y: { max: 20 } }, plugins: { legend: { display: false } } }
+});
+</script>
+{% endblock %}

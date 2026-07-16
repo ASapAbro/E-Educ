@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Mes notes{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-award"></i> Mes notes</h2>
+
+<div class="card text-bg-success shadow-sm mb-4" style="max-width: 300px;">
+  <div class="card-body">
+    <div class="fs-2 fw-bold">{{ moyenne if moyenne is not none else '—' }} / 20</div>
+    <div>Moyenne générale</div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <table class="table mb-0">
+    <thead><tr><th>Formation</th><th>Catégorie</th><th class="text-end">Note</th></tr></thead>
+    <tbody>
+    {% for i in inscriptions %}
+      <tr>
+        <td>{{ i.formation.titre }}</td>
+        <td>{{ i.formation.categorie }}</td>
+        <td class="text-end">
+          {% if i.note is not none %}
+            <span class="badge {{ 'bg-success' if i.note >= 10 else 'bg-danger' }}">{{ i.note }} / 20</span>
+          {% else %}
+            <span class="text-muted">En attente</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="3" class="text-center text-muted py-4">Aucune note disponible pour le moment.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

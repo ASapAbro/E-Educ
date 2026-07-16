@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Mes formations{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-journal-bookmark"></i> Mes formations ({{ courses|length }})</h2>
+
+<div class="card shadow-sm">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Titre</th><th>Catégorie</th><th>Période</th><th class="text-end">Inscrits / Capacité</th><th>Statut</th><th></th></tr></thead>
+    <tbody>
+    {% for c in courses %}
+      <tr>
+        <td>{{ c.titre }}</td>
+        <td>{{ c.categorie }}</td>
+        <td>{{ c.date_debut | datefmt }} &rarr; {{ c.date_fin | datefmt }}</td>
+        <td class="text-end">{{ c.nb_inscrits }} / {{ c.capacite_max }}</td>
+        <td><span class="badge {{ 'bg-success' if c.statut == 'ouverte' else 'bg-secondary' }}">{{ c.statut }}</span></td>
+        <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('teacher.course_students', course_id=c._id) }}">Voir les étudiants</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">Aucune formation ne vous est assignée.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

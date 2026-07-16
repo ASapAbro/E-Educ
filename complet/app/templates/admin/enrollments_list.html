@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Inscriptions{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-clipboard-check"></i> Inscriptions ({{ inscriptions|length }})</h2>
+</div>
+
+<form class="row g-2 mb-3" method="GET">
+  <div class="col-md-3">
+    <select class="form-select" name="statut" onchange="this.form.submit()">
+      <option value="">Tous les statuts</option>
+      <option value="active" {{ 'selected' if statut == 'active' }}>Active</option>
+      <option value="annulee" {{ 'selected' if statut == 'annulee' }}>Annulée</option>
+    </select>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Étudiant</th><th>Formation</th><th>Date</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+    <tbody>
+    {% for i in inscriptions %}
+      <tr>
+        <td>{{ i.etudiant.prenom }} {{ i.etudiant.nom }}</td>
+        <td>{{ i.formation.titre }}</td>
+        <td>{{ i.date_inscription | datefmt }}</td>
+        <td><span class="badge {{ 'bg-success' if i.statut == 'active' else 'bg-secondary' }}">{{ i.statut }}</span></td>
+        <td>{{ i.note if i.note is not none else '—' }}</td>
+        <td class="text-end">
+          {% if i.statut == 'active' %}
+          <form method="POST" action="{{ url_for('admin.enrollment_cancel', inscription_id=i._id) }}" class="d-inline" onsubmit="return confirm('Annuler cette inscription ?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger">Annuler</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">Aucune inscription trouvée.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

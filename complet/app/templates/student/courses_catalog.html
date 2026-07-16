@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Formations disponibles{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-search"></i> Formations disponibles</h2>
+
+<form class="row g-2 mb-4" method="GET">
+  <div class="col-md-4">
+    <input type="text" class="form-control" name="q" value="{{ search }}" placeholder="Rechercher une formation...">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="categorie">
+      <option value="">Toutes catégories</option>
+      {% for c in categories %}
+        <option value="{{ c }}" {{ 'selected' if c == categorie }}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <input type="number" class="form-control" name="prix_max" value="{{ prix_max }}" placeholder="Prix maximum (€)">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-secondary w-100" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+  </div>
+</form>
+
+<div class="row g-3">
+  {% for c in courses %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ c.titre }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ c.categorie }} &middot; {{ c.formateur.prenom }} {{ c.formateur.nom }}</h6>
+        <p class="card-text small flex-grow-1">{{ c.description[:120] }}{{ '…' if c.description|length > 120 }}</p>
+        <ul class="list-unstyled small mb-3">
+          <li><i class="bi bi-currency-euro"></i> {{ "%.2f"|format(c.prix) }} €</li>
+          <li><i class="bi bi-clock"></i> {{ c.duree }} heures</li>
+          <li><i class="bi bi-calendar-range"></i> {{ c.date_debut | datefmt }} &rarr; {{ c.date_fin | datefmt }}</li>
+          <li><i class="bi bi-people"></i> {{ c.nb_inscrits }} / {{ c.capacite_max }} places</li>
+        </ul>
+        {% if c.deja_inscrit %}
+          <button class="btn btn-secondary" disabled>Déjà inscrit</button>
+        {% elif c.complet %}
+          <button class="btn btn-outline-danger" disabled>Complet</button>
+        {% else %}
+          <form method="POST" action="{{ url_for('student.enroll', course_id=c._id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-primary w-100">S'inscrire</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted py-5">Aucune formation ne correspond à votre recherche.</div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord formateur{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Mon tableau de bord</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-bg-primary shadow-sm">
+      <div class="card-body">
+        <div class="fs-2 fw-bold">{{ formations_stats|length }}</div>
+        <div>Mes formations</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-success shadow-sm">
+      <div class="card-body">
+        <div class="fs-2 fw-bold">{{ formations_stats | sum(attribute='nb_inscrits') }}</div>
+        <div>Étudiants inscrits (total)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header">Mes formations</div>
+  <table class="table mb-0">
+    <thead><tr><th>Titre</th><th>Catégorie</th><th>Période</th><th class="text-end">Inscrits / Capacité</th><th></th></tr></thead>
+    <tbody>
+    {% for row in formations_stats %}
+      <tr>
+        <td>{{ row.formation.titre }}</td>
+        <td>{{ row.formation.categorie }}</td>
+        <td>{{ row.formation.date_debut | datefmt }} &rarr; {{ row.formation.date_fin | datefmt }}</td>
+        <td class="text-end">{{ row.nb_inscrits }} / {{ row.formation.capacite_max }}</td>
+        <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('teacher.course_students', course_id=row.formation._id) }}">Voir les étudiants</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">Aucune formation ne vous est encore assignée.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% block title %}Noter {{ etudiant.prenom }} {{ etudiant.nom }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">Attribuer une note</h2>
+<div class="row">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p><strong>Étudiant :</strong> {{ etudiant.prenom }} {{ etudiant.nom }}</p>
+        <p><strong>Formation :</strong> {{ course.titre }}</p>
+        <form method="POST" novalidate>
+          {{ form.hidden_tag() }}
+          {{ render_field(form.note, step="0.25", min="0", max="20") }}
+          <div class="d-flex gap-2 mt-3">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('teacher.course_students', course_id=course._id) }}" class="btn btn-outline-secondary">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ course.titre }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>{{ course.titre }}</h2>
+  <a href="{{ url_for('admin.courses_list') }}" class="btn btn-outline-secondary btn-sm">Retour à la liste</a>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <p>{{ course.description }}</p>
+    <div class="row">
+      <div class="col-md-3"><strong>Catégorie :</strong> {{ course.categorie }}</div>
+      <div class="col-md-3"><strong>Prix :</strong> {{ "%.2f"|format(course.prix) }} €</div>
+      <div class="col-md-3"><strong>Durée :</strong> {{ course.duree }}h</div>
+      <div class="col-md-3"><strong>Capacité :</strong> {{ course.capacite_max }}</div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-md-3"><strong>Formateur :</strong> {{ course.formateur.prenom }} {{ course.formateur.nom }}</div>
+      <div class="col-md-3"><strong>Début :</strong> {{ course.date_debut | datefmt }}</div>
+      <div class="col-md-3"><strong>Fin :</strong> {{ course.date_fin | datefmt }}</div>
+      <div class="col-md-3"><strong>Statut :</strong> {{ course.statut }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header">Étudiants inscrits ({{ inscrits|length }})</div>
+  <table class="table mb-0">
+    <thead><tr><th>Étudiant</th><th>Email</th><th>Date d'inscription</th><th>Statut</th><th>Note</th></tr></thead>
+    <tbody>
+    {% for i in inscrits %}
+      <tr>
+        <td>{{ i.etudiant.prenom }} {{ i.etudiant.nom }}</td>
+        <td>{{ i.etudiant.email }}</td>
+        <td>{{ i.date_inscription | datefmt }}</td>
+        <td><span class="badge {{ 'bg-success' if i.statut == 'active' else 'bg-secondary' }}">{{ i.statut }}</span></td>
+        <td>{{ i.note if i.note is not none else '—' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">Aucun étudiant inscrit.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
