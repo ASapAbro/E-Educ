@@ -82,7 +82,13 @@ avance.
 
 ---
 
-**Où on en est :** Sprint 0 terminé ✅ (variables, fonctions, conditions,
+**Où on en est :** Sprint 0 ✅ (variables, fonctions, conditions,
 boucles/listes, import et `if __name__ == "__main__"`, dictionnaires —
-exercices dans `sprint0/`). Prochaine étape : Sprint 1, premier serveur
-Flask.
+exercices dans `sprint0/`). Sprint 1 ✅ (venv, Flask, routes, Jinja2,
+héritage de templates — `app.py`, `templates/`). Sprint 2 ✅ (MongoDB
+Atlas, PyMongo, `.env`/`.env.example`, connexion + insert/find — voir
+`sprint2/`). Note technique : le cluster est hébergé sur MongoDB Atlas
+(cloud) plutôt qu'en local, suite à un blocage d'installation Homebrew/Xcode
+Command Line Tools sur cette machine. Prochaine étape : Sprint 3, CRUD
+Étudiants (première entité complète, intégrée dans la vraie application
+Flask).
